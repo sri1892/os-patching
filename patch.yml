@@ -97,6 +97,7 @@
             {{ df_output.stdout }}
           dest: /var/tmp/checks/pre_operation_df_outputs_{{ inventory_hostname }}_{{ ansible_date_time.date }}.txt
         delegate_to: localhost
+        become: false
 
       - name: "To save pre-operation outputs of df count to a file"
         ansible.builtin.copy:
@@ -105,6 +106,7 @@
             {{ df_count_output.stdout_lines }}
           dest: /var/tmp/checks/pre_operation_df_count_outputs_{{ inventory_hostname }}_{{ ansible_date_time.date }}.txt
         delegate_to: localhost
+        become: false
 
       - name: "To save pre-operation outputs of filesystem type to a file"
         ansible.builtin.copy:
@@ -113,6 +115,7 @@
             {{ fs_type_output.stdout }}
           dest: /var/tmp/checks/pre_operation_fstype_outputs_{{ inventory_hostname }}_{{ ansible_date_time.date }}.txt
         delegate_to: localhost
+        become: false
 
       - name: "To save pre-operation outputs of filesystem count to a file"
         ansible.builtin.copy:
@@ -121,6 +124,7 @@
             {{ fs_count_output.stdout_lines }}
           dest: /var/tmp/checks/pre_operation_fscount_outputs_{{ inventory_hostname }}_{{ ansible_date_time.date }}.txt
         delegate_to: localhost
+        become: false
 
       - name: "To save pre-operation outputs of kernel to a file"
         ansible.builtin.copy:
@@ -129,6 +133,7 @@
             {{ kernel_version.stdout_lines }}
           dest: /var/tmp/checks/pre_operation_kernel_outputs_{{ inventory_hostname }}_{{ ansible_date_time.date }}.txt
         delegate_to: localhost
+        become: false
 
       - name: "To save pre-operation outputs of memory_output to a file"
         ansible.builtin.copy:
@@ -137,6 +142,7 @@
             {{ memory_output.stdout_lines }}
           dest: /var/tmp/checks/pre_operation_memory_outputs_{{ inventory_hostname }}_{{ ansible_date_time.date }}.txt
         delegate_to: localhost
+        become: false
 
       - name: "To save pre-operation outputs of IP Addr to a file"
         ansible.builtin.copy:
@@ -145,6 +151,7 @@
             {{ interface_output.stdout_lines }} ***
           dest: /var/tmp/checks/pre_operation_ip_outputs_{{ inventory_hostname }}_{{ ansible_date_time.date }}.txt
         delegate_to: localhost
+        become: false
 
       - name: "To save pre-operation outputs of CPU to a file"
         ansible.builtin.copy:
@@ -153,6 +160,7 @@
             {{ cpu_output.stdout_lines }} ***
           dest: /var/tmp/checks/pre_operation_CPU_outputs_{{ inventory_hostname }}_{{ ansible_date_time.date }}.txt
         delegate_to: localhost
+        become: false
 
       - name: "To save pre-operation outputs of resolv.conf to a file"
         ansible.builtin.copy:
@@ -161,6 +169,7 @@
             {{ resolv_output.stdout }} ***
           dest: /var/tmp/checks/pre_operation_resolv_output_{{ inventory_hostname }}_{{ ansible_date_time.date }}.txt
         delegate_to: localhost
+        become: false
 
       - name: "To save pre-operation outputs of routing table to a file"
         ansible.builtin.copy:
@@ -169,6 +178,7 @@
             {{ netstat_output.stdout }} ***
           dest: /var/tmp/checks/pre_operation_netstat_output_{{ inventory_hostname }}_{{ ansible_date_time.date }}.txt
         delegate_to: localhost
+        become: false
 
       - name: "To save pre-operation outputs of running service output to a file"
         ansible.builtin.copy:
@@ -177,12 +187,14 @@
             {{ service_output.stdout }} ***
           dest: /var/tmp/checks/pre_operation_service_output_{{ inventory_hostname }}_{{ ansible_date_time.date }}.txt
         delegate_to: localhost
+        become: false
 
       - name: "Render pre-check HTML report"
         ansible.builtin.template:
           src: templates/precheck_email.html.j2
           dest: /var/tmp/checks/precheck_report_{{ inventory_hostname }}_{{ ansible_date_time.date }}.html
         delegate_to: localhost
+        become: false
 
       - name: "Email pre-check report before patching (as HTML attachment)"
         ansible.builtin.shell: |
@@ -209,6 +221,7 @@
             echo "--$BOUNDARY--"
           } | sendmail -t
         delegate_to: localhost
+        become: false
 
 #Now we will perform patching
       - name: "Check current kernel version , register & perform sanity reboot"
@@ -295,6 +308,7 @@
             {{ df_output.stdout }}
           dest: /var/tmp/checks/post_operation_df_outputs_{{ inventory_hostname }}_{{ ansible_date_time.date }}.txt
         delegate_to: localhost
+        become: false
 
       - name: "To save post-operation outputs of df count to a file"
         ansible.builtin.copy:
@@ -303,6 +317,7 @@
             {{ df_count_output.stdout_lines }}
           dest: /var/tmp/checks/post_operation_df_count_outputs_{{ inventory_hostname }}_{{ ansible_date_time.date }}.txt
         delegate_to: localhost
+        become: false
 
       - name: "To save post-operation outputs of filesystem type to a file"
         ansible.builtin.copy:
@@ -311,6 +326,7 @@
             {{ fs_type_output.stdout }}
           dest: /var/tmp/checks/post_operation_fstype_outputs_{{ inventory_hostname }}_{{ ansible_date_time.date }}.txt
         delegate_to: localhost
+        become: false
 
       - name: "To save post-operation outputs of filesystem count to a file"
         ansible.builtin.copy:
@@ -319,6 +335,7 @@
             {{ fs_count_output.stdout_lines }}
           dest: /var/tmp/checks/post_operation_fscount_outputs_{{ inventory_hostname }}_{{ ansible_date_time.date }}.txt
         delegate_to: localhost
+        become: false
 
       - name: "To save post-operation outputs of kernel to a file"
         ansible.builtin.copy:
@@ -327,6 +344,7 @@
             {{ kernel_version.stdout_lines }}
           dest: /var/tmp/checks/post_operation_kernel_outputs_{{ inventory_hostname }}_{{ ansible_date_time.date }}.txt
         delegate_to: localhost
+        become: false
 
       - name: "To save post-operation outputs of memory_output to a file"
         ansible.builtin.copy:
@@ -335,6 +353,7 @@
             {{ memory_output.stdout_lines }}
           dest: /var/tmp/checks/post_operation_memory_outputs_{{ inventory_hostname }}_{{ ansible_date_time.date }}.txt
         delegate_to: localhost
+        become: false
 
       - name: "To save post-operation outputs of IP Addr to a file"
         ansible.builtin.copy:
@@ -343,6 +362,7 @@
             {{ interface_output.stdout_lines }} ***
           dest: /var/tmp/checks/post_operation_ip_outputs_{{ inventory_hostname }}_{{ ansible_date_time.date }}.txt
         delegate_to: localhost
+        become: false
 
       - name: "To save post-operation outputs of CPU to a file"
         ansible.builtin.copy:
@@ -351,6 +371,7 @@
             {{ cpu_output.stdout_lines }} ***
           dest: /var/tmp/checks/post_operation_CPU_outputs_{{ inventory_hostname }}_{{ ansible_date_time.date }}.txt
         delegate_to: localhost
+        become: false
 
       - name: "To save post-operation outputs of resolv.conf to a file"
         ansible.builtin.copy:
@@ -359,6 +380,7 @@
             {{ resolv_output.stdout }} ***
           dest: /var/tmp/checks/post_operation_resolv_output_{{ inventory_hostname }}_{{ ansible_date_time.date }}.txt
         delegate_to: localhost
+        become: false
 
       - name: "To save post-operation outputs of routing table to a file"
         ansible.builtin.copy:
@@ -367,6 +389,7 @@
             {{ netstat_output.stdout }} ***
           dest: /var/tmp/checks/post_operation_netstat_output_{{ inventory_hostname }}_{{ ansible_date_time.date }}.txt
         delegate_to: localhost
+        become: false
 
       - name: "To save post-operation outputs of running service output to a file"
         ansible.builtin.copy:
@@ -375,72 +398,84 @@
             {{ service_output.stdout }} ***
           dest: /var/tmp/checks/post_operation_service_output_{{ inventory_hostname }}_{{ ansible_date_time.date }}.txt
         delegate_to: localhost
+        become: false
 
 # Now we will perform comparison tasks
       - name: "Comparison task for disk free output"
         ansible.builtin.shell: diff /var/tmp/checks/pre_operation_df_outputs_{{ inventory_hostname }}_{{ ansible_date_time.date }}.txt /var/tmp/checks/post_operation_df_outputs_{{ inventory_hostname }}_{{ ansible_date_time.date }}.txt
         register: df_diff
         delegate_to: localhost
+        become: false
 
         ignore_errors: yes
       - name: "Comparison task for disk free count output"
         ansible.builtin.shell: diff /var/tmp/checks/pre_operation_df_count_outputs_{{ inventory_hostname }}_{{ ansible_date_time.date }}.txt /var/tmp/checks/post_operation_df_count_outputs_{{ inventory_hostname }}_{{ ansible_date_time.date }}.txt
         register: df_count_diff
         delegate_to: localhost
+        become: false
 
         ignore_errors: yes
       - name: "Comparison task for filesystem type output"
         ansible.builtin.shell: diff /var/tmp/checks/pre_operation_fstype_outputs_{{ inventory_hostname }}_{{ ansible_date_time.date }}.txt /var/tmp/checks/post_operation_fstype_outputs_{{ inventory_hostname }}_{{ ansible_date_time.date }}.txt
         register: fstype_diff
         delegate_to: localhost
+        become: false
 
         ignore_errors: yes
       - name: "Comparison task for filesystem count output"
         ansible.builtin.shell: diff /var/tmp/checks/pre_operation_fscount_outputs_{{ inventory_hostname }}_{{ ansible_date_time.date }}.txt /var/tmp/checks/post_operation_fscount_outputs_{{ inventory_hostname }}_{{ ansible_date_time.date }}.txt
         register: fscount_diff
         delegate_to: localhost
+        become: false
 
         ignore_errors: yes
       - name: "Comparison task for kernel version output"
         ansible.builtin.shell: diff /var/tmp/checks/pre_operation_kernel_outputs_{{ inventory_hostname }}_{{ ansible_date_time.date }}.txt /var/tmp/checks/post_operation_kernel_outputs_{{ inventory_hostname }}_{{ ansible_date_time.date }}.txt
         register: kernel_diff
         delegate_to: localhost
+        become: false
 
         ignore_errors: yes
       - name: "Comparison task for memory output"
         ansible.builtin.shell: diff /var/tmp/checks/pre_operation_memory_outputs_{{ inventory_hostname }}_{{ ansible_date_time.date }}.txt /var/tmp/checks/post_operation_memory_outputs_{{ inventory_hostname }}_{{ ansible_date_time.date }}.txt
         register: memory_diff
         delegate_to: localhost
+        become: false
 
         ignore_errors: yes
       - name: "Comparison task for IP Addr output"
         ansible.builtin.shell: diff /var/tmp/checks/pre_operation_ip_outputs_{{ inventory_hostname }}_{{ ansible_date_time.date }}.txt /var/tmp/checks/post_operation_ip_outputs_{{ inventory_hostname }}_{{ ansible_date_time.date }}.txt
         register: interface_diff
         delegate_to: localhost
+        become: false
 
         ignore_errors: yes
       - name: "Comparison task for CPU output"
         ansible.builtin.shell: diff /var/tmp/checks/pre_operation_CPU_outputs_{{ inventory_hostname }}_{{ ansible_date_time.date }}.txt /var/tmp/checks/post_operation_CPU_outputs_{{ inventory_hostname }}_{{ ansible_date_time.date }}.txt
         register: cpu_diff
         delegate_to: localhost
+        become: false
 
         ignore_errors: yes
       - name: "Comparison task for resolv.conf output"
         ansible.builtin.shell: diff /var/tmp/checks/pre_operation_resolv_output_{{ inventory_hostname }}_{{ ansible_date_time.date }}.txt /var/tmp/checks/post_operation_resolv_output_{{ inventory_hostname }}_{{ ansible_date_time.date }}.txt
         register: resolv_diff
         delegate_to: localhost
+        become: false
 
         ignore_errors: yes
       - name: "Comparison task for routing table output"
         ansible.builtin.shell: diff /var/tmp/checks/pre_operation_netstat_output_{{ inventory_hostname }}_{{ ansible_date_time.date }}.txt /var/tmp/checks/post_operation_netstat_output_{{ inventory_hostname }}_{{ ansible_date_time.date }}.txt
         register: routing_diff
         delegate_to: localhost
+        become: false
 
         ignore_errors: yes
       - name: "Comparison task for running services output"
         ansible.builtin.shell: diff /var/tmp/checks/pre_operation_service_output_{{ inventory_hostname }}_{{ ansible_date_time.date }}.txt /var/tmp/checks/post_operation_service_output_{{ inventory_hostname }}_{{ ansible_date_time.date }}.txt
         register: service_diff
         delegate_to: localhost
+        become: false
 
         ignore_errors: yes
 
@@ -449,6 +484,7 @@
           src: templates/postcheck_email.html.j2
           dest: /var/tmp/checks/postcheck_report_{{ inventory_hostname }}_{{ ansible_date_time.date }}.html
         delegate_to: localhost
+        become: false
 
       - name: "Email post-patch comparison report (as HTML attachment)"
         ansible.builtin.shell: |
@@ -475,6 +511,7 @@
             echo "--$BOUNDARY--"
           } | sendmail -t
         delegate_to: localhost
+        become: false
 
 # Now results will be debug for display
 #      - name: "Display disk free output comparison result"
