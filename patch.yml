@@ -45,6 +45,14 @@
         ansible.builtin.fail:
           msg: "There is a difference between /proc/mounts and /etc/fstab. Please check the files. {{ mounts_diff.stdout_lines }}"
         when: false
+      - name: "Ensure /var/tmp/checks directory exists on control node"
+        ansible.builtin.file:
+          path: /var/tmp/checks
+          state: directory
+          mode: '0755'
+        delegate_to: localhost
+        become: false
+
 # Now we will perform pre-operation tasks
       - name: "Pre-operation task for taking disk free output"
         ansible.builtin.shell: df -Ph | grep -v tmpfs
