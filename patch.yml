@@ -1,10 +1,8 @@
   - name: "To patch RHEL servers"
     hosts: all
     become: true
-    vars_prompt:
-      - name: "exclude"
-        prompt: "Enter [To exclude package provide pkg with comma-seperated eg: package1,package2] or Enter [no] to exclude no packages"
-        private: no
+    vars:
+      exclude: "{{ exclude | default('no') }}"
     tasks:
       - name: "Check if the system is CentOS"
         ansible.builtin.assert:
