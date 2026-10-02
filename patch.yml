@@ -45,6 +45,7 @@
         ansible.builtin.fail:
           msg: "There is a difference between /proc/mounts and /etc/fstab. Please check the files. {{ mounts_diff.stdout_lines }}"
         when: false
+# Now we will perform pre-operation tasks
       - name: "Ensure /var/tmp/checks directory exists on control node"
         ansible.builtin.file:
           path: /var/tmp/checks
@@ -53,7 +54,6 @@
         delegate_to: localhost
         become: false
 
-# Now we will perform pre-operation tasks
       - name: "Pre-operation task for taking disk free output"
         ansible.builtin.shell: df -Ph | grep -v tmpfs
         register: df_output
@@ -204,32 +204,39 @@
         delegate_to: localhost
         become: false
 
-      - name: "Email pre-check report before patching (as HTML attachment)"
-        ansible.builtin.shell: |
-          BOUNDARY="ANSIBLE_BOUNDARY_$(date +%s%N)"
-          {
-            echo "To: sriselvakumar2019@gmail.com"
-            echo "From: sriselva189@gmail.com"
-            echo "Subject: Pre-Patch Report - {{ inventory_hostname }} - {{ ansible_date_time.date }}"
-            echo "MIME-Version: 1.0"
-            echo "Content-Type: multipart/mixed; boundary=\"$BOUNDARY\""
-            echo
-            echo "--$BOUNDARY"
-            echo "Content-Type: text/html; charset=UTF-8"
-            echo
-            echo "<html><body style='font-family:Arial,sans-serif;'><p>Hi,</p><p>Please find attached the <b>Pre-Patch Report</b> for <b>{{ inventory_hostname }}</b> dated {{ ansible_date_time.date }}.</p></body></html>"
-            echo
-            echo "--$BOUNDARY"
-            echo "Content-Type: text/html; name=\"Pre-Patch-Report-{{ inventory_hostname }}.html\""
-            echo "Content-Disposition: attachment; filename=\"Pre-Patch-Report-{{ inventory_hostname }}.html\""
-            echo "Content-Transfer-Encoding: base64"
-            echo
-            base64 /var/tmp/checks/precheck_report_{{ inventory_hostname }}_{{ ansible_date_time.date }}.html
-            echo
-            echo "--$BOUNDARY--"
-          } | sendmail -t
+      - name: "Slurp pre-check HTML report (base64)"
+        ansible.builtin.slurp:
+          src: /var/tmp/checks/precheck_report_{{ inventory_hostname }}_{{ ansible_date_time.date }}.html
+        register: precheck_report_b64
         delegate_to: localhost
         become: false
+
+      - name: "Email pre-check report before patching (via SendGrid API)"
+        ansible.builtin.uri:
+          url: https://api.sendgrid.com/v3/mail/send
+          method: POST
+          headers:
+            Authorization: "Bearer {{ lookup('env', 'SENDGRID_API_KEY') }}"
+          body_format: json
+          body:
+            personalizations:
+              - to:
+                  - email: "sriselvakumar2019@gmail.com"
+            from:
+              email: "sriselva189@gmail.com"
+            subject: "Pre-Patch Report - {{ inventory_hostname }} - {{ ansible_date_time.date }}"
+            content:
+              - type: "text/html"
+                value: "<html><body style='font-family:Arial,sans-serif;'><p>Hi,</p><p>Please find attached the <b>Pre-Patch Report</b> for <b>{{ inventory_hostname }}</b> dated {{ ansible_date_time.date }}.</p></body></html>"
+            attachments:
+              - content: "{{ precheck_report_b64.content }}"
+                type: "text/html"
+                filename: "Pre-Patch-Report-{{ inventory_hostname }}.html"
+                disposition: "attachment"
+          status_code: 202
+        delegate_to: localhost
+        become: false
+        no_log: true
 
 #Now we will perform patching
       - name: "Check current kernel version , register & perform sanity reboot"
@@ -494,32 +501,39 @@
         delegate_to: localhost
         become: false
 
-      - name: "Email post-patch comparison report (as HTML attachment)"
-        ansible.builtin.shell: |
-          BOUNDARY="ANSIBLE_BOUNDARY_$(date +%s%N)"
-          {
-            echo "To: sriselvakumar2019@gmail.com"
-            echo "From: sriselva189@gmail.com"
-            echo "Subject: Post-Patch Report - {{ inventory_hostname }} - {{ ansible_date_time.date }}"
-            echo "MIME-Version: 1.0"
-            echo "Content-Type: multipart/mixed; boundary=\"$BOUNDARY\""
-            echo
-            echo "--$BOUNDARY"
-            echo "Content-Type: text/html; charset=UTF-8"
-            echo
-            echo "<html><body style='font-family:Arial,sans-serif;'><p>Hi,</p><p>Please find attached the <b>Post-Patch Comparison Report</b> for <b>{{ inventory_hostname }}</b> dated {{ ansible_date_time.date }}.</p></body></html>"
-            echo
-            echo "--$BOUNDARY"
-            echo "Content-Type: text/html; name=\"Post-Patch-Report-{{ inventory_hostname }}.html\""
-            echo "Content-Disposition: attachment; filename=\"Post-Patch-Report-{{ inventory_hostname }}.html\""
-            echo "Content-Transfer-Encoding: base64"
-            echo
-            base64 /var/tmp/checks/postcheck_report_{{ inventory_hostname }}_{{ ansible_date_time.date }}.html
-            echo
-            echo "--$BOUNDARY--"
-          } | sendmail -t
+      - name: "Slurp post-check HTML report (base64)"
+        ansible.builtin.slurp:
+          src: /var/tmp/checks/postcheck_report_{{ inventory_hostname }}_{{ ansible_date_time.date }}.html
+        register: postcheck_report_b64
         delegate_to: localhost
         become: false
+
+      - name: "Email post-patch comparison report (via SendGrid API)"
+        ansible.builtin.uri:
+          url: https://api.sendgrid.com/v3/mail/send
+          method: POST
+          headers:
+            Authorization: "Bearer {{ lookup('env', 'SENDGRID_API_KEY') }}"
+          body_format: json
+          body:
+            personalizations:
+              - to:
+                  - email: "sriselvakumar2019@gmail.com"
+            from:
+              email: "sriselva189@gmail.com"
+            subject: "Post-Patch Report - {{ inventory_hostname }} - {{ ansible_date_time.date }}"
+            content:
+              - type: "text/html"
+                value: "<html><body style='font-family:Arial,sans-serif;'><p>Hi,</p><p>Please find attached the <b>Post-Patch Comparison Report</b> for <b>{{ inventory_hostname }}</b> dated {{ ansible_date_time.date }}.</p></body></html>"
+            attachments:
+              - content: "{{ postcheck_report_b64.content }}"
+                type: "text/html"
+                filename: "Post-Patch-Report-{{ inventory_hostname }}.html"
+                disposition: "attachment"
+          status_code: 202
+        delegate_to: localhost
+        become: false
+        no_log: true
 
 # Now results will be debug for display
 #      - name: "Display disk free output comparison result"
